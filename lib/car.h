@@ -29,5 +29,4 @@ typedef enum {A0, A1, A2, A3, A4, A5, A6, A7,
 #define PD 0b10
 #define RES 0b11
 
-
 #endif
