@@ -1,3 +1,5 @@
+// Citation: Professor Steven Bell's EE14 (Embedded Systems) I2C code!
+
 #include "stm32l432xx.h"
 #include "i2c.h"
 
@@ -78,4 +80,37 @@ bool i2c_write(I2C_TypeDef* i2c_device, unsigned char receiver_address, unsigned
     }
 
     return true; // Returning true means that we received an ACK, so the write succeeded.
+}
+
+bool i2c_read(I2C_TypeDef* i2c_device, unsigned char receiver_address, unsigned char* data, unsigned char length) {
+    // Checks if I2C is busy and waits until it is not busy anymore.
+    while(i2c_device->ISR & I2C_ISR_BUSY) {}
+
+    // Sets the address of the receiver, number of bytes of data,
+    // generates the START bit and automatically generates the 
+    // STOP bit once the data is finished being read.
+    uint32_t control_reg2 = I2C_CR2_AUTOEND | 
+                            I2C_CR2_RD_WRN |
+                            length << I2C_CR2_NBYTES_Pos |
+                            receiver_address << 1 |
+                            I2C_CR2_START;
+
+    // Sets the control register 2 of the i2c device.
+    i2c_device->CR2 = control_reg2;
+
+    // Reads the data byte by byte and checks the RXNE flag to see if
+    // more data can be read.
+    for(int i = 0; i < length; i++) {
+        while(!(i2c_device->ISR & I2C_ISR_RXNE)) {}
+        data[i] = i2c_device->RXDR;
+    }
+
+    // Checks to see if a NACK flag is generated, which means the data was
+    // not read successfully.
+    if(i2c_device->ISR & I2C_ISR_NACKF) {
+        i2c_device->ISR = I2C_ISR_NACKF;
+        return false;
+    }
+
+    return true; // Data has been read successfully!
 }

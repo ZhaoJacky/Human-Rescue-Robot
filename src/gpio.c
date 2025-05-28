@@ -1,3 +1,5 @@
+// Citation: Professor Steven Bell's EE14 (Embedded Systems) GPIO code!
+
 #include "car.h"
 
 //map each pin to its corresponding port 
