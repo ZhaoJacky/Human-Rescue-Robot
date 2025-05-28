@@ -21,13 +21,14 @@ void i2c_initialize(I2C_TypeDef * i2c_device, PIN scl, PIN sda) {
 
     // Enables the clock based on the I2C Device.
     if (i2c_device == I2C1) {
-        RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
-        RCC->CCIPR &= ~RCC_CCIPR_I2C1SEL;
-        RCC->CCIPR |= 0b01 << RCC_CCIPR_I2C1SEL_Pos; // Use SYSCLK for I2C
+        RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN; // Enables the APB1 Clock for I2C
+        RCC->CCIPR &= ~RCC_CCIPR_I2C1SEL; // Resets the CLK source for I2C.
+        // CCIPR = Clock Configuration Independent Peripheral Register
+        RCC->CCIPR |= 0b01 << RCC_CCIPR_I2C1SEL_Pos; // Sets SYSCLK as CLK source for I2C
 
         // This resets the I2C module.
-        RCC->APB1RSTR1 |= RCC_APB1RSTR1_I2C1RST;
-        RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_I2C1RST;
+        RCC->APB1RSTR1 |= RCC_APB1RSTR1_I2C1RST; // Resets the I2C hardware peripheral
+        RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_I2C1RST; // Enables it again.
 
     } else if (i2c_device == I2C3) {
         RCC->APB1ENR1 |= RCC_APB1ENR1_I2C3EN;
@@ -51,11 +52,12 @@ void i2c_initialize(I2C_TypeDef * i2c_device, PIN scl, PIN sda) {
 
 bool i2c_write(I2C_TypeDef* i2c_device, unsigned char receiver_address, unsigned char* data, unsigned char length) {
     while(i2c_device->ISR & I2C_ISR_BUSY) {} // Checks if I2C is busy and waits until it is not.
+    // Interrupt and Status Register = ISR
 
-    uint32_t cr2 = I2C_CR2_AUTOEND |
-                   length << I2C_CR2_NBYTES_Pos |
+    uint32_t cr2 = I2C_CR2_AUTOEND | // Sends a STOP bit after sending data (NBYTES)
+                   length << I2C_CR2_NBYTES_Pos | // Sets the number of bytes that are being sent.
                    receiver_address << 1 | // Only bits 7:1 matter for 7-bit address
-                   I2C_CR2_START;
+                   I2C_CR2_START; // Sends a START bit.
     i2c_device->CR2 = cr2;
 
     for(int i = 0; i < length; i++){
