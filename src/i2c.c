@@ -56,11 +56,11 @@ bool i2c_write(I2C_TypeDef* i2c_device, unsigned char receiver_address, unsigned
     while(i2c_device->ISR & I2C_ISR_BUSY) {} // Checks if I2C is busy and waits until it is not.
     // Interrupt and Status Register = ISR
 
-    uint32_t cr2 = I2C_CR2_AUTOEND | // Sends a STOP bit after sending data (NBYTES)
+    uint32_t control_reg2 = I2C_CR2_AUTOEND | // Sends a STOP bit after sending data (NBYTES)
                    length << I2C_CR2_NBYTES_Pos | // Sets the number of bytes that are being sent.
                    receiver_address << 1 | // Only bits 7:1 matter for 7-bit address
                    I2C_CR2_START; // Sends a START bit.
-    i2c_device->CR2 = cr2;
+    i2c_device->CR2 = control_reg2;
 
     for(int i = 0; i < length; i++){
         

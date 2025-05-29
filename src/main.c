@@ -1,5 +1,6 @@
 #include "stm32l432xx.h"
 #include "car.h"
+#include "i2c.h"
 
 void led_test(PIN pin){
     GPIO_moder(pin, OUTPUT);
@@ -15,8 +16,8 @@ void led_test(PIN pin){
 }
 
 int main() {
-    
+    i2c_initialize(I2C1, D1, D0);
     while(1) {
-        led_test(A2);
+        
     }
 }
