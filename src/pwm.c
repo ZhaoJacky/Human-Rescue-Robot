@@ -1,4 +1,4 @@
-#include pwm.h
+#include "pwm.h"
 
 int pwm_timer_config(TIM_TypeDef* const timer, const unsigned int freq_hz){
     // Enable the clock for the timer
