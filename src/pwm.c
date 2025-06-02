@@ -1,4 +1,5 @@
-#include pwm.h
+#include "pwm.h"
+#include "car.h"
 
 int pwm_timer_config(TIM_TypeDef* const timer, const unsigned int freq_hz){
     // Enable the clock for the timer
@@ -81,3 +82,68 @@ int g_Timer16Channel[D13+1] = {
   -1,-1,-1,-1,  // D8=PC15,D9=PA8,D10=PA11,D11=PB5
   -1,-1         // D12=PB4,D13=PB3.
 };
+
+/*
+timer_config_channel_pwm
+Input: pointer to timer struct of the pin, the pin being used, and the duty cycle
+Description: 
+- assigns appropriate channel according to pin number
+- calculates and assigns appropriate CCR value
+Output: whether or not an error occurred due to a pin not being PWM capable
+- returns EE14Lib_ERR_INVALID_CONFIG if the pin has no corresponding channel  
+(not PWM capable)
+- otherwise returns EE14Lib_Err_OK
+*/
+int timer_config_channel_pwm(TIM_TypeDef* const timer, const PIN pin, const unsigned int duty)
+{
+    int channel = -1;
+    if(timer == TIM1){
+        channel = g_Timer1Channel[pin];
+    } else if(timer  == TIM2){
+        channel = g_Timer2Channel[pin];
+    } else if(timer == TIM15){
+        channel = g_Timer15Channel[pin];
+    } else if(timer == TIM16){
+        channel = g_Timer16Channel[pin];
+    }
+
+    if(channel < 0){
+        return -1;
+    }
+
+    int channel_idx = channel >> 1; // Lowest bit is N
+
+    //calculates and assignes appropriate CCR value based of given duty cycle
+    *((unsigned int*)timer + 13 + channel_idx) = (duty)*((timer -> ARR)+1)/1023;
+
+    // Enable PWM mode, and set preload enable (only update counter on rollover)
+    if(channel_idx == 0){
+        timer->CCMR1 &= ~(TIM_CCMR1_OC1M);
+        timer->CCMR1 |= (TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1);
+        timer->CCMR1 |= TIM_CCMR1_OC1PE;
+    } else if(channel_idx == 1){
+        timer->CCMR1 &= ~(TIM_CCMR1_OC2M);
+        timer->CCMR1 |= (TIM_CCMR1_OC2M_2 | TIM_CCMR1_OC2M_1);
+        timer->CCMR1 |= TIM_CCMR1_OC2PE;
+    } else if(channel_idx == 2){
+        timer->CCMR2 &= ~(TIM_CCMR2_OC3M);
+        timer->CCMR2 |= (TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1);
+        timer->CCMR2 |= TIM_CCMR2_OC3PE;
+    } else { // Must be 3
+        timer->CCMR2 &= ~(TIM_CCMR2_OC4M);
+        timer->CCMR2 |= (TIM_CCMR2_OC4M_2 | TIM_CCMR2_OC4M_1);
+        timer->CCMR2 |= TIM_CCMR2_OC4PE;
+    }
+
+    // Enable the capture/compare output
+    timer->CCER |= 1 << (2*channel); // Primary enables are 0, 4, 8, 12; inverted are 2, 6
+
+    if(timer == TIM1 || timer == TIM2){
+        gpio_config_alternate_function(pin, 1); // AFR = 1 is timer mode for timers 1 & 2
+    } else {
+        gpio_config_alternate_function(pin, 14); // AFR = 14 for timers 15 & 16
+    }
+
+    return 0;
+}
+
