@@ -31,6 +31,7 @@ typedef enum {A0, A1, A2, A3, A4, A5, A6, A7,
 #define PD 0b10
 #define RES 0b11
 
+/* -------------------------- GPIO Functions --------------------------------*/
 static void GPIO_enable_port(GPIO_TypeDef *port);
 int GPIO_moder(PIN pin, unsigned int mode);
 int GPIO_pupdr(PIN pin, unsigned int mode);
@@ -39,5 +40,7 @@ int GPIO_ospeedr(PIN pin, unsigned int mode);
 int GPIO_afr(PIN pin, unsigned int func);
 void GPIO_write(PIN pin, bool value);
 bool GPIO_idr(PIN pin);
+/* --------------------------------------------------------------------------*/
+
 
 #endif
