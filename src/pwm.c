@@ -1,39 +1,53 @@
+/* Citation: Professor Steven Bell's EE14 Pulse-Width Modulation Code! */
+
 #include "pwm.h"
 #include "car.h"
 
-int pwm_timer_config(TIM_TypeDef* const timer, const unsigned int freq_hz){
+int timer_config_pwm(TIM_TypeDef* const timer, const unsigned int freq_hz){
     // Enable the clock for the timer
-    if(timer == TIM1){ 
+    if(timer == TIM1){
         RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
-    }else if(timer == TIM2){
+    }
+    else if(timer == TIM2){
         RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;
-    }else if(timer == TIM15){
+    }
+    else if(timer == TIM15){
         RCC->APB2ENR |= RCC_APB2ENR_TIM15EN;
-    }else if(timer == TIM16){
+    }
+    else if(timer == TIM16){
         RCC->APB2ENR |= RCC_APB2ENR_TIM16EN;
-    }else{
-        return -1;
+    }
+    else{
+        return EE14Lib_Err_NOT_IMPLEMENTED;
     }
 
-    /*Set the prescaler value as: original frequency over desired
-    (4MHz/desired frequency), divided by the max value of ARR, minimizing
-    prescalar and maximizing arr, allowing widest range of duty cycles (colors)
-    */
-    unsigned int p = (4000000/freq_hz)/(65535);
-    timer -> PSC = p;
+    // Top-level control registers are fine with defaults (except for turning it on, later)
+
+    // Calculates and sets the minimum pre-scaler value by using the desired
+    // frequency, freq_hz.
+    timer->PSC = (4000000 / freq_hz) / 1023;
+
+    // Frequency of the clock after getting scaled by the pre-scaler.
+    unsigned int freq_psc = ((4000000) / (timer->PSC + 1));
+
+    // Calculates the reload value based on the frequency of the pre-scaled clock,
+    // and the desired frequency.
+    unsigned int reload_value = ((freq_psc) / (freq_hz)) - 1;
 
     // Set the reload value
-    unsigned int n = 4000000/(p+1); //calculate new PWM frequency after prescaler is applied
-    //divide new frequency by desired, then subtract 1 for ARR value & assign to register
-    timer -> ARR = n/freq_hz - 1; 
+    timer->ARR = reload_value;
 
     // Set the main output enable
+    // timer->BDTR |= TIM_BDTR_MOE;
+
+    // if (timer == TIM1) {
     timer->BDTR |= TIM_BDTR_MOE;
+    // }
 
     // And enable the timer itself
     timer->CR1 |= TIM_CR1_CEN;
 
-    return 0;
+    return EE14Lib_Err_OK;
 }
 
 // Mapping of GPIO pin to timer channel
@@ -94,8 +108,7 @@ Output: whether or not an error occurred due to a pin not being PWM capable
 (not PWM capable)
 - otherwise returns EE14Lib_Err_OK
 */
-int timer_config_channel_pwm(TIM_TypeDef* const timer, const PIN pin, const unsigned int duty)
-{
+int timer_config_channel_pwm(TIM_TypeDef* const timer, const PIN pin, const unsigned int duty){
     int channel = -1;
     if(timer == TIM1){
         channel = g_Timer1Channel[pin];
@@ -108,13 +121,26 @@ int timer_config_channel_pwm(TIM_TypeDef* const timer, const PIN pin, const unsi
     }
 
     if(channel < 0){
-        return -1;
+        return EE14Lib_ERR_INVALID_CONFIG;
     }
 
     int channel_idx = channel >> 1; // Lowest bit is N
 
+    // There are 4 CCR registers (one for each possible channel), so the funky
+    // pointer math `timer + 13 + channel_idx` is just picking the right one to
+    // set.  You shouldn't have to touch that part, just replace the value on
+    // the right side of the assignment.
+
+    // Calculates the compare_value (the value that determines when the
+    // output of a pin is set to HIGH) using the duty value.
+    unsigned int compare_value = ((timer->ARR + 1)*(1023 - duty)) / 1023;
+
+    // Set the compare value
+    // Timer CCR registers are 0x34 through 0x40
+    *((unsigned int*)timer + 13 + channel_idx) = compare_value;
+
     //calculates and assignes appropriate CCR value based of given duty cycle
-    *((unsigned int*)timer + 13 + channel_idx) = (duty)*((timer -> ARR)+1)/1023;
+    //*((unsigned int*)timer + 13 + channel_idx) = (duty)*((timer -> ARR)+1)/1023;
 
     // Enable PWM mode, and set preload enable (only update counter on rollover)
     if(channel_idx == 0){
@@ -139,11 +165,11 @@ int timer_config_channel_pwm(TIM_TypeDef* const timer, const PIN pin, const unsi
     timer->CCER |= 1 << (2*channel); // Primary enables are 0, 4, 8, 12; inverted are 2, 6
 
     if(timer == TIM1 || timer == TIM2){
-        gpio_config_alternate_function(pin, 1); // AFR = 1 is timer mode for timers 1 & 2
+        GPIO_afr(pin, 1); // AFR = 1 is timer mode for timers 1 & 2
     } else {
-        gpio_config_alternate_function(pin, 14); // AFR = 14 for timers 15 & 16
+        GPIO_afr(pin, 14); // AFR = 14 for timers 15 & 16
     }
 
-    return 0;
+    return EE14Lib_Err_OK;
 }
 

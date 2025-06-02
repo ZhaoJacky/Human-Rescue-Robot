@@ -36,7 +36,7 @@ static uint8_t pin_arr[D13 + 1] = {
 * bitwise or
 * Output: void function; no output
 */
-static void GPIO_enable_port(GPIO_TypeDef *port){
+static void GPIO_enable_port(GPIO_TypeDef *port) {
     unsigned long bit_set; //32 bit
     if(port == GPIOA){
         bit_set = RCC_AHB2ENR_GPIOAEN; //.h file defined constant for 0x00000001
@@ -44,12 +44,13 @@ static void GPIO_enable_port(GPIO_TypeDef *port){
         bit_set = RCC_AHB2ENR_GPIOBEN; //0x00000002
     }else if(port == GPIOC){
         bit_set = RCC_AHB2ENR_GPIOCEN; //0x00000004
-    }
+    }else{
+        bit_set = RCC_AHB2ENR_GPIOHEN;
+    }           
     RCC -> AHB2ENR |= bit_set; //AHB2ENR peripheral clock enable register
-
 }
 
-/* GPIO_mode
+/* GPIO_moder
 * Input: pointer to port that the pin is on, the pin number necessary
 * Function: determines the port which the pin is located on and ensures it is 
 * enabled. Clears the bits corresponding to the pin. Sets the corresponding 2 
@@ -57,7 +58,7 @@ static void GPIO_enable_port(GPIO_TypeDef *port){
 * Output: -1 if the mode passed in is invalid, 0 if no errors
 */
 int GPIO_moder(PIN pin, unsigned int mode){
-    GPIO_TypeDef *find_port = port[pin];
+    GPIO_TypeDef* find_port = port[pin];
     uint8_t offset = pin_arr[pin];
 
     if(mode & ~0b11UL){ //if bits other than bottom 2 are 1s, mode is invalid
@@ -72,7 +73,7 @@ int GPIO_moder(PIN pin, unsigned int mode){
 }
 
 int GPIO_pupdr(PIN pin, unsigned int mode){
-    GPIO_TypeDef *find_port = port[pin];
+    GPIO_TypeDef* find_port = port[pin];
     uint8_t offset = pin_arr[pin];
 
     if(mode & ~0b11UL){ //if bits other than bottom 2 are 1s, mode is invalid
@@ -86,7 +87,7 @@ int GPIO_pupdr(PIN pin, unsigned int mode){
 }
 
 int GPIO_otyper(PIN pin, unsigned int mode){
-    GPIO_TypeDef *find_port = port[pin];
+    GPIO_TypeDef* find_port = port[pin];
     uint8_t offset = pin_arr[pin];
 
     if(mode & ~0b1UL){ //if bits other than bottom 1 are 1s, mode is invalid
@@ -100,7 +101,7 @@ int GPIO_otyper(PIN pin, unsigned int mode){
 }
 
 int GPIO_ospeedr(PIN pin, unsigned int mode){
-    GPIO_TypeDef *find_port = port[pin];
+    GPIO_TypeDef* find_port = port[pin];
     uint8_t offset = pin_arr[pin];
 
     if(mode & ~0b11UL){ //if bits other than bottom 2 are 1s, mode is invalid
@@ -114,16 +115,18 @@ int GPIO_ospeedr(PIN pin, unsigned int mode){
 }
 
 int GPIO_afr(PIN pin, unsigned int func){
-    GPIO_TypeDef *find_port = port[pin];
+    GPIO_TypeDef* find_port = port[pin];
     uint8_t offset = pin_arr[pin];
+
+    GPIO_enable_port(find_port);
+
+    find_port -> MODER &= ~(0b11 << offset*2);
+    find_port -> MODER |= (0b10 << offset*2);
 
     unsigned int afr_offset = offset*4;
 
-    find_port -> MODER &= ~(0b11 << offset);
-    find_port -> MODER |= (0b10 << offset);
-
-    find_port -> AFR[afr_offset >> 5] &= ~(0b1111 << (offset & 0x1F));
-    find_port -> AFR[afr_offset >> 5] |= (func << (offset & 0x1F));
+    find_port -> AFR[afr_offset >> 5] &= ~(0b1111 << (0x1F & afr_offset));
+    find_port -> AFR[afr_offset >> 5] |= (func << (0x1F & afr_offset));
 
     return 0;
 }

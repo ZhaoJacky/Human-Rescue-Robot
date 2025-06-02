@@ -1,6 +1,4 @@
 // Citation: Professor Steven Bell's EE14 (Embedded Systems) I2C code!
-
-#include "stm32l432xx.h"
 #include "i2c.h"
 
 void i2c_initialize(I2C_TypeDef * i2c_device, PIN scl, PIN sda) {
