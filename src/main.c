@@ -29,21 +29,27 @@ void motor_init(PIN en, PIN ph){
 
     //configure each pin with duty cycles (0-1023) for an initial color
     //tim 1 d1 d9 d0 (en/pwm)
-    timer_config_channel_pwm(TIM1, en, 100); 
+    timer_config_channel_pwm(TIM1, en, 700); 
 
     //direction ph/output
     GPIO_moder(ph, OUTPUT);
     GPIO_pupdr(ph, NO_PUPD);
     GPIO_otyper(ph, PUSH_PULL);
     GPIO_ospeedr(ph, LOW);
-    GPIO_write(ph, 1);
+    GPIO_write(ph, 0);
+
+    GPIO_moder(D4, OUTPUT);
+    GPIO_pupdr(D4, NO_PUPD);
+    GPIO_otyper(D4, PUSH_PULL);
+    GPIO_ospeedr(D4, LOW);
+    GPIO_write(D4, 1);
     for(volatile int i = 0; i < 1000; i++){}
     // GPIO_write(ph, 0);
     // for(volatile int i = 0; i < 1000; i++){}
 }
 
 void motor(PIN en, PIN ph){
-    GPIO_write(ph, 1);
+    GPIO_write(ph, 0);
     for(volatile int i = 0; i < 1000; i++){}
 }
 
