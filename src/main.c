@@ -3,6 +3,7 @@
 #include "i2c.h"
 #include "uart.h"
 #include "pwm.h"
+#include "movement.h"
 
 int _write(int file, char *data, int len) {
     serial_write(USART2, data, len);
@@ -22,43 +23,48 @@ void led_test(PIN pin){
     //GPIO_idr(pin);
 }
 
-
-void motor_init(PIN en, PIN ph){
-    //configure Timer 1 with 2000 hz frequency
-    timer_config_pwm(TIM1, 1000);
-
-    //configure each pin with duty cycles (0-1023) for an initial color
-    //tim 1 d1 d9 d0 (en/pwm)
-    timer_config_channel_pwm(TIM1, en, 700); 
-
-    //direction ph/output
-    GPIO_moder(ph, OUTPUT);
-    GPIO_pupdr(ph, NO_PUPD);
-    GPIO_otyper(ph, PUSH_PULL);
-    GPIO_ospeedr(ph, LOW);
-    GPIO_write(ph, 0);
-
-    GPIO_moder(D4, OUTPUT);
-    GPIO_pupdr(D4, NO_PUPD);
-    GPIO_otyper(D4, PUSH_PULL);
-    GPIO_ospeedr(D4, LOW);
-    GPIO_write(D4, 1);
-    for(volatile int i = 0; i < 1000; i++){}
-    // GPIO_write(ph, 0);
-    // for(volatile int i = 0; i < 1000; i++){}
+void enable_button(PIN button) {
+    GPIO_moder(button, INPUT);
+    GPIO_pupdr(button, PD);
+    
 }
 
-void motor(PIN en, PIN ph){
-    GPIO_write(ph, 0);
-    for(volatile int i = 0; i < 1000; i++){}
+void buttons(PIN backward, PIN stop_pin, PIN forward, PIN phase, PIN enable1, PIN enable2){
+    enable_button(backward);
+    enable_button(stop_pin);
+    enable_button(forward);
+
+    if(GPIO_idr(backward)){
+        move_backward(phase);
+    }else if(GPIO_idr(stop_pin)){
+        stop(enable1, enable2);
+    }else if(GPIO_idr(forward)){
+        move_forward(phase);
+    }
 }
+
+
 
 int main() {
 
-    motor_init(D1, D0);
-    motor(D1, D0);
+    host_serial_init();
+
+    init_motor(D1, A7, D0, D4);
+    // move_forward(D0);
+    // for(volatile int i = 0; i < 1500000; i++){}
+    // move_backward(D0);
+    // for(volatile int i = 0; i < 1500000; i++){}
+    // stop(D1, A7);                                                                                                                        ````````````    ``````````````  ``````````````````````````````````````````````````````````````````````  `
+    // for(volatile int i = 0; i < 1500000; i++){}
+    // modify_speed(D1, A7, 700);
+    // for(volatile int i = 0; i < 1500000; i++){}
+    // move_forward(D0);
+    // for(volatile int i = 0; i < 1500000; i++){}
+    // spin_left(D1, A7);
+    // for(volatile int i = 0; i < 1500000; i++){}
+    // spin_right(D1, A7);
 
     while(1) {
-        
+        buttons(D12, A3, D8, D0, D1, A7);
     }
 }
