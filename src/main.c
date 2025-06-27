@@ -5,6 +5,8 @@
 #include "pwm.h"
 #include "movement.h"
 
+volatile int press = 0;
+
 int _write(int file, char *data, int len) {
     serial_write(USART2, data, len);
     return len;
@@ -34,13 +36,21 @@ void buttons(PIN backward, PIN stop_pin, PIN forward, PIN phase, PIN enable1, PI
     enable_button(stop_pin);
     enable_button(forward);
 
-    if(GPIO_idr(backward)){
-        move_backward(phase);
-    }else if(GPIO_idr(stop_pin)){
+    // if(GPIO_idr(backward)){
+    //     move_backward(phase);
+    if(GPIO_idr(stop_pin)){
+        // press++;
         stop(enable1, enable2);
     }else if(GPIO_idr(forward)){
-        move_forward(phase);
+        // press++;
+        move_forward(phase, enable1, enable2);
     }
+
+    // if(press%2){ //odd
+    //     move_forward(phase, enable1, enable2);
+    // }else{
+    //     stop(enable1, enable2);
+    // }
 }
 
 
@@ -50,21 +60,8 @@ int main() {
     host_serial_init();
 
     init_motor(D1, A7, D0, D4);
-    // move_forward(D0);
-    // for(volatile int i = 0; i < 1500000; i++){}
-    // move_backward(D0);
-    // for(volatile int i = 0; i < 1500000; i++){}
-    // stop(D1, A7);                                                                                                                        ````````````    ``````````````  ``````````````````````````````````````````````````````````````````````  `
-    // for(volatile int i = 0; i < 1500000; i++){}
-    // modify_speed(D1, A7, 700);
-    // for(volatile int i = 0; i < 1500000; i++){}
-    // move_forward(D0);
-    // for(volatile int i = 0; i < 1500000; i++){}
-    // spin_left(D1, A7);
-    // for(volatile int i = 0; i < 1500000; i++){}
-    // spin_right(D1, A7);
 
     while(1) {
-        buttons(D12, A3, D8, D0, D1, A7);
+        buttons(D12, A3, D9, D0, D1, A7);
     }
 }

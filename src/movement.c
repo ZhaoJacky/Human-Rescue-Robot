@@ -26,8 +26,8 @@ void init_motor(PIN enable1, PIN enable2, PIN phase,PIN mode) {
     timer_config_pwm(TIM2, 1000);
 
     //set speed using PWM, TIM1, and TIM2
-    timer_config_channel_pwm(TIM1, enable1, 700); 
-    timer_config_channel_pwm(TIM2, enable2, 700);
+    timer_config_channel_pwm(TIM1, enable1, 100); 
+    timer_config_channel_pwm(TIM2, enable2, 100);
 
     //direction phase/output
     GPIO_moder(phase, OUTPUT);
@@ -51,8 +51,10 @@ Arguments:
 Return:
 Effect:
 */
-void move_forward(PIN phase) {
-    GPIO_write(phase, 1);
+void move_forward(PIN phase, PIN enable1, PIN enable2) {
+    timer_config_channel_pwm(TIM1, enable1, 100); 
+    timer_config_channel_pwm(TIM2, enable2, 100);
+    GPIO_write(phase, 0);
 }
 
 /*
@@ -74,9 +76,9 @@ Return:
 Effect:
 */
 void spin_right(PIN enable1, PIN enable2) {
-    timer_config_channel_pwm(TIM1, enable1, 1023);
+    timer_config_channel_pwm(TIM1, enable1, 1023); //stop
     //ronaldo moves
-    timer_config_channel_pwm(TIM2, enable2, 600);
+    timer_config_channel_pwm(TIM2, enable2, 600); //move
 }
 
 /*
