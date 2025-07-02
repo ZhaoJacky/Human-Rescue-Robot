@@ -3,14 +3,14 @@
 
 /*
 motor 1: Right Motor
-enable/speed: D1
-phase: D0
+enable/speed: D6
+phase: D2
 */
 
 /*
 ronaldo: Left Motor
-enable/speed: A7
-phase: D0
+enable/speed: A0
+phase: D2
 */
 
 /*

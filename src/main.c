@@ -45,12 +45,6 @@ void buttons(PIN backward, PIN stop_pin, PIN forward, PIN phase, PIN enable1, PI
         // press++;
         move_forward(phase, enable1, enable2);
     }
-
-    // if(press%2){ //odd
-    //     move_forward(phase, enable1, enable2);
-    // }else{
-    //     stop(enable1, enable2);
-    // }
 }
 
 
@@ -59,9 +53,9 @@ int main() {
 
     host_serial_init();
 
-    init_motor(D1, A7, D0, D4);
+    init_motor(D6, A0, D2, D4);
 
     while(1) {
-        buttons(D12, A3, D9, D0, D1, A7);
+        buttons(D12, A3, D9, D2, D6, A0);
     }
 }
