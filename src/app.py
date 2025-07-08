@@ -1,9 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for
 import serial
 
-# Adjust the COM port and baud rate as needed
-ser = serial.Serial('COM5', 9600, timeout=1)
-
 app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
@@ -14,11 +11,17 @@ def home():
 def control():
     command = request.form["command"]
     print(f"Command received: {command}")
-    ser.write((command + "\n").encode())  # Send to STM32
+    try:
+        with serial.Serial('COM5', 9600, timeout=1) as ser:
+            ser.write((command + "\n").encode())
+            print("✅ Command sent to COM5")
+    except Exception as e:
+        print(f"⚠️ Could not send command to COM5: {e}")
+    
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)  # Disable auto-reloader to avoid serial port conflict
 
     #git add .
     #git commit -m "app"
