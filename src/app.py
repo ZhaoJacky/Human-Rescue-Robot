@@ -1,40 +1,25 @@
-from flask import Flask, request, render_template_string
-#imports: Flask to create the app, request accesses incoming form data 
-# (e.g. button presses), render_template string allows html strings in the 
-# template (not separate files)
+from flask import Flask, request, render_template, redirect, url_for
+import serial
+
+# Adjust the COM port and baud rate as needed
+ser = serial.Serial('COM5', 9600, timeout=1)
 
 app = Flask(__name__)
 
-# HTML template with buttons
-HTML = """
-<!DOCTYPE html>
-<html>
-<head><title>RC Car Controller</title></head>
-<body>
-  <h1>Control Your RC Car</h1>
-  <form method="post" action="/control">
-    <button name="command" value="forward">Forward</button>
-    <button name="command" value="left">Left</button>
-    <button name="command" value="right">Right</button>
-    <button name="command" value="backward">Backward</button>
-    <button name="command" value="stop">Stop</button>
-  </form>
-</body>
-</html>
-"""
-
-# Main page
 @app.route("/", methods=["GET"])
 def home():
-    return render_template_string(HTML)
+    return render_template("index.html")
 
-# Handle button clicks
 @app.route("/control", methods=["POST"])
 def control():
     command = request.form["command"]
-    print(f"Command received: {command}")  # Replace with code to control motors
-    return f"<p>Command: {command}</p><p><a href='/'>Back to Control</a></p>"
+    print(f"Command received: {command}")
+    ser.write((command + "\n").encode())  # Send to STM32
+    return redirect(url_for("home"))
 
 if __name__ == "__main__":
     app.run(debug=True)
 
+    #git add .
+    #git commit -m "app"
+    #git push origin main
