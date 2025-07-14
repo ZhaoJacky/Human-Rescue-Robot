@@ -15,7 +15,7 @@ static void set_gpio_alt_func (GPIO_TypeDef *gpio,unsigned int pin,unsigned int 
 // push-pull drive.
 static void UART2_GPIO_Init(void) {
     set_gpio_alt_func (GPIOA,  2, 7);
-    set_gpio_alt_func (GPIOA, 15, 3);
+    set_gpio_alt_func (GPIOA, 3, 7);
 
     // Set PA2 and PA15 to very-high-speed. This changes the output slew rate.
     GPIOA->OSPEEDR |=   0x3<<(2*2) | 0x3<<(2*15);

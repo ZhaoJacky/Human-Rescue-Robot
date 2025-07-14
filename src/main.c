@@ -53,9 +53,34 @@ int main() {
 
     host_serial_init();
 
+    GPIO_moder(A1, OUTPUT);
+    GPIO_pupdr(A1, NO_PUPD);
+    GPIO_otyper(A1, PUSH_PULL);
+    GPIO_ospeedr(A1, LOW);
     init_motor(D6, A0, D2, D4);
+    stop(D6, A0);
+
+    //
 
     while(1) {
-        buttons(D12, A3, D9, D2, D6, A0);
+
+        char byte = '0';
+        if (USART2->ISR & USART_ISR_RXNE) {
+            byte = USART2->RDR;  // Always read, this clears RXNE and ORE
+            printf("Got byte: %c\n", byte);
+        }
+
+        if(byte == 'a') {
+            move_forward(D2, D6, A0);
+            // GPIO_write(A1, 1);
+        }
+        
+        if (USART2->ISR & USART_ISR_ORE) {
+            printf("Overrun! Missed a byte\n");
+            USART2->ICR |= USART_ICR_ORECF;  // Clear ORE flag
+        }
+
+
+        // buttons(D12, A3, D9, D2, D6, A0);
     }
 }
