@@ -72,15 +72,15 @@ int main() {
 
         if(byte == 'a') {
             move_forward(D2, D6, A0);
-            // GPIO_write(A1, 1);
-        }
-        
-        if (USART2->ISR & USART_ISR_ORE) {
-            printf("Overrun! Missed a byte\n");
-            USART2->ICR |= USART_ICR_ORECF;  // Clear ORE flag
+        } else if (byte == 'b') {
+            move_backward(D2);
+        } else if (byte == 'c') {
+            spin_left(D6, A0);
+        } else if (byte == 'd') {
+            spin_right(D6, A0);
+        } else {
+            stop(D6, A0);
         }
 
-
-        // buttons(D12, A3, D9, D2, D6, A0);
     }
 }

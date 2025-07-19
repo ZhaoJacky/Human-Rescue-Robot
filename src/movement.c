@@ -25,9 +25,9 @@ void init_motor(PIN enable1, PIN enable2, PIN phase,PIN mode) {
     timer_config_pwm(TIM1, 1000);
     timer_config_pwm(TIM2, 1000);
 
-    //set speed using PWM, TIM1, and TIM2
-    timer_config_channel_pwm(TIM1, enable1, 100); 
-    timer_config_channel_pwm(TIM2, enable2, 100);
+    //set speed using PWM, TIM1, and TIM2 (start motor as stopped)
+    timer_config_channel_pwm(TIM1, enable1, 1024); //1024 
+    timer_config_channel_pwm(TIM2, enable2, 1024);
 
     //direction phase/output
     GPIO_moder(phase, OUTPUT);
