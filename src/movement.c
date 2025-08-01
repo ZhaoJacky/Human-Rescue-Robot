@@ -64,8 +64,10 @@ Arguments:
 Return:
 Effect:
 */
-void move_backward(PIN phase) {
-    GPIO_write(phase, 0);
+void move_backward(PIN phase, PIN enable1, PIN enable2) {
+    timer_config_channel_pwm(TIM1, enable1, 100); 
+    timer_config_channel_pwm(TIM2, enable2, 100);
+    GPIO_write(phase, 1);
 }
 
 /*

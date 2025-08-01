@@ -53,14 +53,8 @@ int main() {
 
     host_serial_init();
 
-    GPIO_moder(A1, OUTPUT);
-    GPIO_pupdr(A1, NO_PUPD);
-    GPIO_otyper(A1, PUSH_PULL);
-    GPIO_ospeedr(A1, LOW);
     init_motor(D6, A0, D2, D4);
     stop(D6, A0);
-
-    //
 
     while(1) {
 
@@ -72,15 +66,18 @@ int main() {
 
         if(byte == 'a') {
             move_forward(D2, D6, A0);
-        } else if (byte == 'b') {
-            move_backward(D2);
-        } else if (byte == 'c') {
-            spin_left(D6, A0);
-        } else if (byte == 'd') {
+            for(volatile int i = 0; i < 100000; i++){}
+        } else if(byte == 'b') {
+            move_backward(D2, D6, A0);
+            for(volatile int i = 0; i < 100000; i++){}
+        } else if(byte == 'c') {
             spin_right(D6, A0);
+            for(volatile int i = 0; i < 100000; i++){}
+        } else if (byte == 'd') {
+            spin_left(D6, A0);
+            for(volatile int i = 0; i < 100000; i++){}
         } else {
             stop(D6, A0);
         }
-
     }
 }
