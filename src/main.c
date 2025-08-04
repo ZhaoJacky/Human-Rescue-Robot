@@ -72,15 +72,16 @@ int main() {
 
         if(byte == 'a') {
             move_forward(D2, D6, A0);
-        } else if (byte == 'b') {
-            move_backward(D2);
-        } else if (byte == 'c') {
-            spin_left(D6, A0);
-        } else if (byte == 'd') {
-            spin_right(D6, A0);
-        } else {
-            stop(D6, A0);
         }
+        // } else if (byte == 'b') {
+        //     move_backward(D2);
+        // } else if (byte == 'c') {
+        //     spin_left(D6, A0);
+        // } else if (byte == 'd') {
+        //     spin_right(D6, A0);
+        // } else {
+        //     stop(D6, A0);
+        // }
 
     }
 }

@@ -26,3 +26,7 @@ if __name__ == "__main__":
     #git add .
     #git commit -m "app"
     #git push origin main
+
+#to run the website
+#make sure in src folder then in terminal:
+# python app.py
