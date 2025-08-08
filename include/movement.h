@@ -5,7 +5,7 @@
 
 void init_motor(PIN enable1, PIN enable2, PIN phase,PIN mode);
 void move_forward(PIN phase, PIN enable1, PIN enable2);
-void move_backward(PIN phase);
+void move_backward(PIN phase, PIN enable1, PIN enable2);
 void spin_right(PIN enable1, PIN enable2);
 void spin_left(PIN enable1, PIN enable2);
 void stop(PIN enable1, PIN enable2);
