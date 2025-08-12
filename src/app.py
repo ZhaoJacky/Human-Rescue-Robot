@@ -1,5 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for
-import serial
+import socket  # New for network communication
+
+PI_IP = "10.5.14.14"  # Replace with your Raspberry Pi's IP
+PI_PORT = 5005          # Port that Pi's listener will use
 
 app = Flask(__name__)
 
@@ -11,17 +14,19 @@ def home():
 def control():
     command = request.form["command"]
     print(f"Command received: {command}")
+    
     try:
-        with serial.Serial('COM5', 9600, timeout=1) as ser:
-            ser.write((command + "\n").encode())
-            print("✅ Command sent to COM5")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((PI_IP, PI_PORT))
+            s.sendall(command.encode())
+            print("✅ Command sent to Raspberry Pi")
     except Exception as e:
-        print(f"⚠️ Could not send command to COM5: {e}")
+        print(f"⚠️ Could not send command to Raspberry Pi: {e}")
     
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    app.run(debug=True, use_reloader=False)  # Disable auto-reloader to avoid serial port conflict
+    app.run(debug=True, use_reloader=False)
 
     #git add .
     #git commit -m "app"
