@@ -91,7 +91,7 @@ Return:
 Effect:
 */
 void spin_left(PIN enable1, PIN enable2) {
-    //right motor turns
+    //bill motor turns
     timer_config_channel_pwm(TIM1, enable1, 600);
     timer_config_channel_pwm(TIM2, enable2, 1023);
 }

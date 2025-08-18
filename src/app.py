@@ -1,15 +1,17 @@
 from flask import Flask, request, render_template, redirect, url_for
-import socket  # New for network communication
+import socket  #module for network communication
 
 PI_IP = "10.5.14.14"  # Replace with your Raspberry Pi's IP
 PI_PORT = 5005          # Port that Pi's listener will use
 
-app = Flask(__name__)
+app = Flask(__name__) #creates instance of flask class
 
-@app.route("/", methods=["GET"])
-def home():
+#python decorator
+@app.route("/", methods=["GET"]) #GET is standard browser page load
+def home(): #run this function version when someone visits url "/" via get method
     return render_template("index.html")
 
+#python decorator
 @app.route("/control", methods=["POST"])
 def control():
     command = request.form["command"]
