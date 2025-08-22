@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  
+
 <head>
   <title>
     RC Car Controller
@@ -10,12 +10,12 @@
 
 <body>
   <h1>Control Your RC Car</h1>
-  <form method="post" action="/control">
-    <button name="command" value="a">Forward</button>
-    <button name="command" value="c">Left</button>
-    <button name="command" value="d">Right</button>
-    <button name="command" value="b">Backward</button>
-    <button name="command" value="stop">Stop</button>
+  <form method="post" action="/control" class="controller">
+    <button name="command" value="a" id = "forward">Forward</button>
+    <button name="command" value="c" id = "left">Left</button>
+    <button name="command" value="d" id = "right">Right</button>
+    <button name="command" value="b" id = "backward">Backward</button>
+    <button name="command" value="stop" id = "stop">Stop</button>
   </form>
 </body>
 </html>

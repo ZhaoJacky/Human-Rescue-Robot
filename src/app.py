@@ -23,6 +23,7 @@ def control():
             s.sendall(command.encode())
             print("✅ Command sent to Raspberry Pi")
     except Exception as e:
+        #exception is saved inside of e then prints it
         print(f"⚠️ Could not send command to Raspberry Pi: {e}")
     
     return redirect(url_for("home"))
