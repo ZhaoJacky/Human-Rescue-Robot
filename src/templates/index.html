@@ -17,5 +17,20 @@
     <button name="command" value="b" id = "backward">Backward</button>
     <button name="command" value="stop" id = "stop">Stop</button>
   </form>
+
+  <h2>Camera</h2>
+  <a href = "/capture"> <!-- photo trigger button -->
+    <button> Take Photo </button>
+  </a>
+
+  <div> <!-- show latest photo -->
+    <img src = "{{ url_for('static', filename = 'test.jpg') }}?t={{ time }}" width = "500">
+  </div>
+
+  <div> <!-- download link -->
+    <a href = "{{ url_for('static', 'filename = 'test.jpg') }} " download = "photo.jpg">
+      Download Photo
+    </a>
+  </div>
 </body>
 </html>
