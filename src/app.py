@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for
-import socket, time  #module for network communication
+import socket, time, os  #module for network communication
 
 PI_IP = "10.5.14.14"  # Replace with your Raspberry Pi's IP
 PI_PORT = 5005          # Port that Pi's listener will use
@@ -31,7 +31,8 @@ def control():
     
     return redirect(url_for("home"))
 
-@app.route("/capture")
+@app.route("/capture", methods=["POST"])
+
 def capture():
     #send command to pi so it runs camera.py
     command = "photo"
@@ -42,8 +43,9 @@ def capture():
             print("Capture command sent to Rasperry Pi")
     except Exception as e:
         print(f"Could not request photo from Raspberry Pi: {e}")
+        
+    os.system(f"scp jacky@{PI_IP}:/home/jacky/Car/latest.jpg {PHOTO_FOLDER}/{PHOTO_FILENAME}")
 
-    os.system(f"scp jacky@{PI_IP}:/home/jacky/latest.jpg {PHOTO_FOLDER}/{PHOTO_FILENAME}")
 
 
     return redirect(url_for("home"))

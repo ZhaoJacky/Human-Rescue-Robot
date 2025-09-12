@@ -19,18 +19,18 @@
   </form>
 
   <h2>Camera</h2>
-  <a href = "/capture"> <!-- photo trigger button -->
-    <button> Take Photo </button>
-  </a>
+  <form method="post" action="{{ url_for('capture') }}">
+  <button type="submit">📸 Take Photo</button>
+  </form>
 
   <div> <!-- show latest photo -->
     <img src = "{{ url_for('static', filename = 'test.jpg') }}?t={{ time }}" width = "500">
   </div>
 
   <div> <!-- download link -->
-    <a href = "{{ url_for('static', 'filename = 'test.jpg') }} " download = "photo.jpg">
-      Download Photo
-    </a>
+    <a href="{{ url_for('static', filename='test.jpg') }}" download="photo.jpg">
+    ⬇️ Download Photo
+  </a>
   </div>
 </body>
 </html>
