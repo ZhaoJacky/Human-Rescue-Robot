@@ -43,7 +43,7 @@ def capture():
             print("Capture command sent to Rasperry Pi")
     except Exception as e:
         print(f"Could not request photo from Raspberry Pi: {e}")
-
+        
     os.system(f"scp jacky@{PI_IP}:/home/jacky/Car/latest.jpg {PHOTO_FOLDER}/{PHOTO_FILENAME}")
 
 
@@ -57,6 +57,6 @@ if __name__ == "__main__":
     #git commit -m "app"
     #git push origin main
 
-#to run the website 
+#to run the website  
 #make sure in src folder then in terminal:
 # python app.py
