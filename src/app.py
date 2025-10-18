@@ -34,7 +34,7 @@ def control():
 @app.route("/capture", methods=["POST"])
 
 def capture():
-    #send command to pi so it runs camera.py
+    #send command to pi so it runs camera.py !
     command = "photo"
     try:
         with socket.socket(socket.AP_INET, socket.SOCK_STREAM) as s:
