@@ -13,7 +13,9 @@ home
 - renders the html template for the home page
 - automatically executed when the root url is in the browser
 '''
+#When someone visits the url '/' using a get request, run the home function 
 @app.route("/", methods=["GET"]) #GET is standard browser page load
+#GET requests do not modify server data, only request it
 def home(): #run this function version when someone visits url "/" via get method
     return render_template("index.html", time = time.time())
 
@@ -22,6 +24,7 @@ control:
 - basically called whenever you press one of the arrows
 '''
 @app.route("/control", methods=["POST"])
+#POST: send data to server to create or update resources
 def control():
     command = request.form["command"]
     print(f"Command received: {command}")
@@ -56,6 +59,7 @@ def capture():
     os.system(f"scp jacky@{PI_IP}:/home/jacky/Car/latest.jpg {PHOTO_FOLDER}/{PHOTO_FILENAME}")
 
     return redirect(url_for("home")) #sends u back home after taking the photo
+
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
