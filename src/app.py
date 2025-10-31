@@ -8,13 +8,19 @@ PHOTO_FILENAME = "test.jpg"
 
 app = Flask(__name__) #creates instance of flask class
 
-
-#python decorator
+'''
+home
+- renders the html template for the home page
+- automatically executed when the root url is in the browser
+'''
 @app.route("/", methods=["GET"]) #GET is standard browser page load
 def home(): #run this function version when someone visits url "/" via get method
     return render_template("index.html", time = time.time())
 
-#python decorator
+'''
+control:
+- basically called whenever you press one of the arrows
+'''
 @app.route("/control", methods=["POST"])
 def control():
     command = request.form["command"]
@@ -31,8 +37,11 @@ def control():
     
     return redirect(url_for("home"))
 
+'''
+capture:
+called whenever you take a photo
+'''
 @app.route("/capture", methods=["POST"])
-
 def capture():
     #send command to pi so it runs camera.py !
     command = "photo"
@@ -46,9 +55,7 @@ def capture():
         
     os.system(f"scp jacky@{PI_IP}:/home/jacky/Car/latest.jpg {PHOTO_FOLDER}/{PHOTO_FILENAME}")
 
-
-
-    return redirect(url_for("home"))
+    return redirect(url_for("home")) #sends u back home after taking the photo
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
