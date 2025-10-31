@@ -23,10 +23,14 @@ def home(): #run this function version when someone visits url "/" via get metho
 control:
 - basically called whenever you press one of the arrows
 '''
+#when someone sends a POST request to /control call control()
 @app.route("/control", methods=["POST"])
 #POST: send data to server to create or update resources
 def control():
+    #assigns command variable to whatever is named "command" in the form
     command = request.form["command"]
+    #at this point, request represents the POST request from someone pressing an arrow
+    
     print(f"Command received: {command}")
     
     try:
